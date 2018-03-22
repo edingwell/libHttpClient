@@ -19,11 +19,13 @@ int stprintf_s(char(&buffer)[SIZE], _Printf_format_string_ char const* format ..
 {
 #if (defined(ANDROID) || defined(__ANDROID__))
     va_list varArgs = va_list();
+#elif (defined(__APPLE__))
+    va_list varArgs;
 #else
     va_list varArgs = nullptr;
 #endif
     va_start(varArgs, format);
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
     auto result = vsprintf(buffer, format, varArgs);
 #else
     auto result = vsprintf_s(buffer, format, varArgs);
@@ -36,12 +38,14 @@ int stprintf_s(char* buffer, size_t size, _Printf_format_string_ char const* for
 {
 #if (defined(ANDROID) || defined(__ANDROID__))
     va_list varArgs = va_list();
+#elif (defined(__APPLE__))
+    va_list varArgs;
 #else
     va_list varArgs = nullptr;
 #endif
     va_start(varArgs, format);
 
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
     auto result = vsprintf(buffer, format, varArgs);
 #else
     auto result = vsprintf_s(buffer, size, format, varArgs);
@@ -53,7 +57,7 @@ int stprintf_s(char* buffer, size_t size, _Printf_format_string_ char const* for
 template<size_t SIZE>
 int vstprintf_s(char(&buffer)[SIZE], _Printf_format_string_ char const* format, va_list varArgs)
 {
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
     return vsprintf(buffer, format, varArgs);
 #else
     return vsprintf_s(buffer, format, varArgs);
@@ -62,7 +66,7 @@ int vstprintf_s(char(&buffer)[SIZE], _Printf_format_string_ char const* format, 
 
 void OutputDebugStringT(char const* string)
 {
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
 #else
     OutputDebugStringA(string);
 #endif
@@ -151,7 +155,7 @@ void TraceMessageToDebugger(
     uint32_t     fractionMSec = static_cast<uint32_t>(timestamp % 1000);
     std::tm      fmtTime = {};
 
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
 #else
     localtime_s(&fmtTime, &timeTInSec);
 #endif
@@ -219,7 +223,7 @@ void TraceMessageToClient(
 
 unsigned long long GetScopeId()
 {
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
     return 0;
 #else
     LARGE_INTEGER li = {};
@@ -264,7 +268,7 @@ void HCTraceImplMessage(
 
     auto timestamp = GetTraceState().GetTimestamp();
 
-#if (defined(ANDROID) || defined(__ANDROID__))
+#if (defined(ANDROID) || defined(__ANDROID__) || defined(__APPLE__))
     auto threadId = 0;
 #else
     auto threadId = GetCurrentThreadId();
@@ -274,6 +278,8 @@ void HCTraceImplMessage(
 
 #if (defined(ANDROID) || defined(__ANDROID__))
     va_list varArgs = va_list();
+#elif (defined(__APPLE__))
+    va_list varArgs;
 #else
     va_list varArgs = nullptr;
 #endif
